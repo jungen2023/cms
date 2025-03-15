@@ -10,8 +10,8 @@
 #### 安装教程
 
 1.  将docker基础镜像导入本地
-    `docker load < docker-images/alpine.v3.6.tar.gz
-     docker images`
+    `docker load < docker-images/alpine.v3.6.tar.gz`
+    `docker images`    #查看导入结果
 2.  xxxx
 3.  xxxx
 
