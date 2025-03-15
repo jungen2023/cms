@@ -4,12 +4,14 @@
 内容管理系统（Content Management System，CMS）是一种用于创建、编辑、管理和发布数字内容的软件系统，尤其适用于网站建设。
 
 #### 软件架构
-软件架构说明
+软件架构说明：lnmp/lamp
 
 
 #### 安装教程
 
-1.  xxxx
+1.  将docker基础镜像导入本地
+    `docker load < docker-images/alpine.v3.6.tar.gz
+     docker images`
 2.  xxxx
 3.  xxxx
 
