@@ -27,7 +27,7 @@
     记录mysql的用户密码  
 5.  将app包解压到/data/app中 
     `cd www/ && unzip seacms-13.zip`  
-    将upload文件夹里的文件全部复制到/data/app下  
+    将seacms-13文件夹里的文件全部复制到/data/app下  
     `chmod -R 777 /data/app`  
 6.  安装SeaCms  
     - 运行http://域名/install/index.php进行程序安装，填写mysql用户密码 
