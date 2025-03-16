@@ -35,7 +35,7 @@
 
 #### 使用说明
 
-1.  xxxx
+1.  seacms服务器后台：http://IP:Port/cms/,其中cms/的“/”必须要有，否则页面错误
 2.  xxxx
 3.  xxxx
 
