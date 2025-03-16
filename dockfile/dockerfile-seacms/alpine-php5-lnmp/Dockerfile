@@ -10,6 +10,7 @@ RUN apk add openrc pwgen \
             mariadb mariadb-client \
             nginx openssl openssl-dev \
             php5 php5-fpm php5-pdo_mysql php5-opcache php5-ctype php5-curl php5-dom php5-iconv php5-gd php5-json php5-mysqli php5-openssl php5-pdo php5-pdo_sqlite php5-sqlite3 php5-xml php5-xmlreader php5-zlib php5-phar php5-posix php5-bz2 php5-zip  #安装php及其拓展
+RUN apk clean
 
 #上传配置文件
 ADD nginx_default.conf /etc/nginx/conf.d/default.conf
