@@ -9,7 +9,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.6/main" > /etc/apk/repositories &&
 RUN apk add openrc pwgen \
             mariadb mariadb-client \
             nginx openssl openssl-dev \
-            php5 php5-fpm php5-pdo_mysql php5-opcache php5-ctype php5-curl php5-dom php5-iconv php5-gd php5-json php5-mysqli php5-openssl php5-pdo php5-pdo_sqlite php5-sqlite3 php5-xml php5-xmlreader php5-zlib php5-phar php5-posix php5-bz2 php5-zip  #安装php及其拓展
+            php8 php8-fpm php8-pdo_mysql php8-mysqli php8-mbstring php8-iconv php8-openssl php8-curl php8-zip php8-opcache php8-gd php8-xml php8-simplexml php8-apcu php8-session php8-json php8-zlib  #安装php及其拓展
 RUN apk clean
 
 #上传配置文件
