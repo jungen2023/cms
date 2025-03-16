@@ -8,7 +8,7 @@
 
 
 #### 安装教程
-
+ **方案一** 
 1.  将docker基础镜像导入本地
     `docker load < docker-images/alpine.v3.6.tar.gz`
     查看导入结果
@@ -32,6 +32,9 @@
 6.  安装SeaCms  
     - 运行http://域名/install/index.php进行程序安装，填写mysql用户密码 
     - 安装完毕后为了安全请删除安装目录（install） 
+
+ **方案二** 
+使用Jenkinsfile方式，文件位置：JenKinsfile/docker.alpine-php5-lnmp.seacms
 
 #### 使用说明
 
