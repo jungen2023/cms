@@ -24,4 +24,4 @@ RUN chmod +x /*.sh
 EXPOSE 80 3306
 
 #docker运行时执行命令
-CMD ["tail", "-f", "/dev/null"]
+CMD ["sh", "-c", "php-fpm5 --daemonize && nginx"]
