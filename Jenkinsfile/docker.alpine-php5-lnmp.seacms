@@ -40,7 +40,7 @@ node {
         
         dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-lnmp'){
             sh "docker build -t alpine-php5-lnmp ." 
-            sh "docker builder prune"
+            sh "docker builder prune -f"
         }
     }
     
