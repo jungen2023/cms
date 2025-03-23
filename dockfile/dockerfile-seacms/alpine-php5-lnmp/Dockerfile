@@ -16,8 +16,8 @@ ADD nginx_default.conf /etc/nginx/conf.d/default.conf
 
 #上传脚本
 ADD run.sh /run.sh
-ADD init-mysql.sh /init-mysql.sh
-ADD init-php_nginx.sh /init-php_nginx.sh
+ADD mysql0.sh /mysql0.sh
+ADD php_nginx0.sh /php_nginx0.sh
 RUN chmod +x /*.sh
 
 #暴漏端口
