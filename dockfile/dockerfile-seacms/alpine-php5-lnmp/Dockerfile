@@ -24,4 +24,4 @@ RUN chmod +x /*.sh
 EXPOSE 80 3306
 
 #docker运行时执行命令
-CMD /run.sh
+CMD ["/run.sh"]
