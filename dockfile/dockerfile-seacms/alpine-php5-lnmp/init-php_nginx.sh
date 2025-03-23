@@ -22,5 +22,5 @@ mkdir /run/nginx
 killall nginx php-fpm5
 php-fpm5 --daemonize
 nginx
-rc-update add php-fpm  #开机自启动php-fpm5
-rc-update add nginx     #开机自启动nginx
+#rc-update add php-fpm  #开机自启动php-fpm5
+#rc-update add nginx     #开机自启动nginx
