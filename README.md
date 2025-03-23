@@ -18,12 +18,12 @@
     查看结果:`docker images`  
     清理构建缓存:`docker builder prune`
 3.  运行容器  
-    `docker run -d -t -p 2006:3306 -p 2080:80 -v /data/mdb:/var/lib/mysql -v /data/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp /bin/sh`
+    `docker run -d -t -p 2006:3306 -p 2080:80 -v /data/mdb:/var/lib/mysql -v /data/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp`
     查看容器运行状态：`docker ps -a` 
     没问题后执行下一步 
 4.  初始化容器  
     登录容器：`docker exec -it seacms /bin/sh` 
-    初始化：`run.sh` 
+    初始化：`/mysql0.sh && /php_nginx0.sh` 
     记录mysql的用户密码  
 5.  将app包解压到/data/app中 
     `cd www/ && unzip seacms-13.zip`  
