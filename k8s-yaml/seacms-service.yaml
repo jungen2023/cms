@@ -12,10 +12,12 @@ spec:
     protocol: TCP
     port: 2080
     targetPort: 80
+    nodePort: 30080
   - name: mdb
     protocol: TCP
     port: 2006
     targetPort: 3306
+    nodePort: 33306
   selector:
     app: seacms
   type: NodePort
