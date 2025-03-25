@@ -6,7 +6,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.6/main" > /etc/apk/repositories &&
     apk update  #更新使源地址生效
 
 #安装软件包,openrc开机自启动管理软件
-RUN apk add --nocache openrc \
+RUN apk add openrc \
             nginx openssl openssl-dev \
             php5 php5-fpm php5-pdo_mysql php5-mysqli php5-iconv php5-openssl php5-curl php5-zip php5-opcache php5-gd php5-xml php5-json php5-zlib  #安装php及其拓展
 
