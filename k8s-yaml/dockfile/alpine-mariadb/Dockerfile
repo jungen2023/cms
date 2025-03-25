@@ -6,7 +6,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.6/main" > /etc/apk/repositories &&
     apk update  #更新使源地址生效
 
 #安装软件包,openrc开机自启动管理软件
-RUN apk add --no-cache openrc pwgen mariadb mariadb-client
+RUN apk add openrc pwgen mariadb mariadb-client
 
 
 #上传脚本
