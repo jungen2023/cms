@@ -8,9 +8,13 @@ metadata:
   namespace: cms
 spec:
   ports:
-  - port: 2080
+  - name: seacms
+    protocol: TCP
+    port: 2080
     targetPort: 80
-  - port: 2006
+  - name: mdb
+    protocol: TCP
+    port: 2006
     targetPort: 3306
   selector:
     app: seacms
