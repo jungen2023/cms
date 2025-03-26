@@ -1,0 +1,82 @@
+checkout=0
+node {
+    stage('pull code'){
+       git credentialsId: '8c6e5e99-2e98-4e9d-90e1-8e7eae035a5e', url: 'https://gitee.com/jungen2023/cms.git'
+    }
+    
+    stage('check&remove container'){
+       script{
+          checkout=sh(
+                script: 'docker ps -a | grep seacms',
+                returnStatus: true
+            )
+          
+          if(checkout==0){
+                sh 'docker stop seacms'
+                sh 'docker rm seacms'
+                sh 'rm -rf /seacms/{mdb,app}'
+            }
+        }	
+    }
+    
+    stage('check&remove docker-image'){
+       script{
+          checkout=sh(
+                script: 'docker images -a | grep alpine-php5-lnmp',
+                returnStatus: true
+            )
+            
+          if(checkout==0){
+                sh 'docker rmi alpine-php5-lnmp'
+                sh 'docker image prune -f'
+            }
+        }	
+    }
+
+    stage('build docker-image'){
+        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
+            sh "docker load < alpine.v3.6.tar.gz" 
+        }
+        
+        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-lnmp'){
+            sh "docker build -t alpine-php5-lnmp ." 
+            sh "docker builder prune -f"
+        }
+    }
+    
+    stage('start container'){
+        sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
+        sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
+        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
+            sh "unzip seacms-13.zip -d /seacms/app/"
+            sh "chmod -R 777 /seacms/app"
+            sh "mv /seacms/app/seacms-13/* /seacms/app/ && rm -rf /seacms/app/seacms-13"
+        }
+    }
+
+    stage('人工操作') {
+        steps {
+            script {
+                  input message: '请浏览器访问“http://ip:2080”，根据提示完成海洋cms安装向导，确认完成后继续', 
+                        ok: '继续执行', 
+                        id: 'manual_approval'
+            }
+        }
+    }
+
+    stage('build k8s-image'){
+        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
+            sh 'docker export seacms > seacms.tar'
+            sh 'cat seacms.tar | docker import - seacms'
+            sh 'docker stop seacms'
+            sh 'docker rm seacms'
+            sh 'docker rmi alpine-php5-lnmp'
+        }
+    }
+
+    stage('apply k3s-seacms'){
+        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
+            sh 'k3s kubectl apply -f seacms.yaml'
+        } 
+    }
+}

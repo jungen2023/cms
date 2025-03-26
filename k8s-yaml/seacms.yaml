@@ -124,6 +124,8 @@ spec:
       - name: seacms
         image: seacms
         imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args: ["/run.sh && tail -f /dev/null"]
         ports:
         - containerPort: 80
           protocol: TCP
@@ -159,7 +161,7 @@ spec:
   - port: 2006
     protocol: TCP
     targetPort: 3306
-    nodePort: 33306
+    nodePort: 30306
   selector:
     app: seacms
   type: NodePort
