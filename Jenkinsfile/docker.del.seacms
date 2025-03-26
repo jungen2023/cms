@@ -10,7 +10,7 @@ node {
           if(checkout==0){
                 sh 'docker stop seacms'
                 sh 'docker rm seacms'
-                sh 'rm -rf /data/{mdb,app}'
+                sh 'rm -rf /seacms/{mdb,app}'
             }
         }	
     }

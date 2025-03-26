@@ -14,7 +14,7 @@ node {
           if(checkout==0){
                 sh 'docker stop seacms'
                 sh 'docker rm seacms'
-                sh 'rm -rf /data/{mdb,app}'
+                sh 'rm -rf /seacms/{mdb,app}'
             }
         }	
     }
@@ -45,12 +45,12 @@ node {
     }
     
     stage('start container'){
-        sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /data/mdb:/var/lib/mysql -v /data/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
+        sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
         sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
         dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
-            sh "unzip seacms-13.zip -d /data/app/"
-            sh "chmod -R 777 /data/app"
-            sh "mv /data/app/seacms-13/* /data/app/ && rm -rf /data/app/seacms-13"
+            sh "unzip seacms-13.zip -d /seacms/app/"
+            sh "chmod -R 777 /seacms/app"
+            sh "mv /seacms/app/seacms-13/* /seacms/app/ && rm -rf /seacms/app/seacms-13"
         }
     }
 }
