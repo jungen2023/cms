@@ -122,7 +122,7 @@ spec:
     spec:
       containers:
       - name: seacms
-        image: alpine-php-nginx
+        image: seacms-app
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
@@ -131,7 +131,7 @@ spec:
         - mountPath: "/var/www/localhost/htdocs"
           name: seacmsapp
       - name: mdb
-        image: alpine-mariadb
+        image: seacms-mdb
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3306
@@ -146,3 +146,27 @@ spec:
       - name: seacmsmdb
         persistentVolumeClaim:
           claimName: seacms-mdb  #PVC名字
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: seacms
+  name: seacms
+  namespace: cms
+spec:
+  ports:
+  - name: seacms
+    protocol: TCP
+    port: 2080
+    targetPort: 80
+    nodePort: 30080
+  - name: mdb
+    protocol: TCP
+    port: 2006
+    targetPort: 3306
+    nodePort: 33306
+  selector:
+    app: seacms
+  type: NodePort
