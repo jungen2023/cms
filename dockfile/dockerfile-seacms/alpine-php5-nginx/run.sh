@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f "/run/nginx" ];then
+if [ -d "/run/nginx" ];then
    php-fpm5 --daemonize
    nginx
 else
