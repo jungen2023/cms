@@ -71,6 +71,7 @@ node {
             sh 'docker stop seacms'
             sh 'docker rm seacms'
             sh 'docker rmi alpine-php5-lnmp'
+            sh 'docker rmi alpine:3.6'
         }
     }
 
