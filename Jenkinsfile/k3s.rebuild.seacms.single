@@ -77,7 +77,7 @@ node {
 
     stage('apply k3s-seacms'){
         dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
-            sh 'k3s kubectl apply -f seacms.yaml'
+            sh 'k3s kubectl apply -f seacms.single.yaml'
         } 
     }
 }
