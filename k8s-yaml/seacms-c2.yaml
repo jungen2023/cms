@@ -163,12 +163,12 @@ spec:
   ports:
   - name: seacms
     protocol: TCP
-    port: 2080
+    port: 80
     targetPort: 80
     nodePort: 30080
   - name: mdb
     protocol: TCP
-    port: 2006
+    port: 3306
     targetPort: 3306
     nodePort: 30306
   selector:
