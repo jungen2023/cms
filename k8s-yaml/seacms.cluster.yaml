@@ -165,9 +165,9 @@ spec:
   ports:
   - name: web
     protocol: TCP
-    port: 80
-    targetPort: 80
-    nodePort: 30080
+    port: 80           #service对外端口
+    targetPort: 80     #容器端口
+    nodePort: 30080    #nodeport
   - name: mysql
     protocol: TCP
     port: 3306
