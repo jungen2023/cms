@@ -1,4 +1,4 @@
-#创建namespace:cms
+#创建namespace: cms
 apiVersion: v1  #指定了 Kubernetes API 的版本为v1
 kind: Namespace
 metadata:
