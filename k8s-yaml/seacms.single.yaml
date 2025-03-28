@@ -157,10 +157,10 @@ metadata:
 spec:
   ports:
   - name: web
-    port: 80
+    port: 80         #service对外端口
     protocol: TCP
-    targetPort: 80
-    nodePort: 30080
+    targetPort: 80   #容器端口
+    nodePort: 30080  #NodePort
   - name: mysql
     port: 3306
     protocol: TCP
