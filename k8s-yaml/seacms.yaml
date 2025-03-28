@@ -154,11 +154,11 @@ metadata:
   namespace: cms
 spec:
   ports:
-  - port: 2080
+  - port: 80
     protocol: TCP
     targetPort: 80
     nodePort: 30080
-  - port: 2006
+  - port: 3306
     protocol: TCP
     targetPort: 3306
     nodePort: 30306
