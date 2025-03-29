@@ -56,7 +56,7 @@ node {
 
     stage('人工操作') {
         script {
-            input message: '请浏览器访问“http://ip:2080”，根据提示完成海洋cms安装向导，确认完成后继续', 
+            input message: '请浏览器访问“http://ip:30080”，根据提示完成海洋cms安装向导，确认完成后继续', 
             ok: '继续执行', 
             id: 'manual_approval'
         }
