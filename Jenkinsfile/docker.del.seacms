@@ -5,14 +5,14 @@ node {
           checkout=sh(
                 script: 'docker ps -a | grep seacms',
                 returnStatus: true
-            )
+          )
           
           if(checkout==0){
                 sh 'docker stop seacms'
                 sh 'docker rm seacms'
                 sh 'rm -rf /seacms/{mdb,app}'
-            }
-        }	
+          }
+       }	
     }
     
     stage('check&remove docker-image'){
@@ -20,12 +20,12 @@ node {
           checkout=sh(
                 script: 'docker images -a | grep alpine-php5-lnmp',
                 returnStatus: true
-            )
+          )
             
           if(checkout==0){
                 sh 'docker rmi alpine-php5-lnmp'
                 sh 'docker image prune -f'
-            }
-        }	
+          }
+       }	
     }
 }

@@ -9,14 +9,14 @@ node {
           checkout=sh(
                 script: 'docker ps -a | grep seacms',
                 returnStatus: true
-            )
+          )
           
           if(checkout==0){
                 sh 'docker stop seacms'
                 sh 'docker rm seacms'
                 sh 'rm -rf /seacms/{mdb,app}'
-            }
-        }	
+          }
+       }	
     }
     
     stage('check&remove docker-image'){
@@ -24,33 +24,33 @@ node {
           checkout=sh(
                 script: 'docker images -a | grep alpine-php5-lnmp',
                 returnStatus: true
-            )
+          )
             
           if(checkout==0){
                 sh 'docker rmi alpine-php5-lnmp'
                 sh 'docker image prune -f'
-            }
-        }	
+          }
+       }	
     }
 
     stage('build docker-image'){
-        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
-            sh "docker load < alpine.v3.6.tar.gz" 
-        }
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
+          sh "docker load < alpine.v3.6.tar.gz" 
+       }
         
-        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-lnmp'){
-            sh "docker build -t alpine-php5-lnmp ." 
-            sh "docker builder prune -f"
-        }
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-lnmp'){
+          sh "docker build -t alpine-php5-lnmp ." 
+          sh "docker builder prune -f"
+       }
     }
     
     stage('start container'){
-        sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
-        sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
-        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
-            sh "unzip seacms-13.zip -d /seacms/app/"
-            sh "chmod -R 777 /seacms/app"
-            sh "mv /seacms/app/seacms-13/* /seacms/app/ && rm -rf /seacms/app/seacms-13"
-        }
+       sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
+       sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
+          sh "unzip seacms-13.zip -d /seacms/app/"
+          sh "chmod -R 777 /seacms/app"
+          sh "mv /seacms/app/seacms-13/* /seacms/app/ && rm -rf /seacms/app/seacms-13"
+       }
     }
 }
