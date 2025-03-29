@@ -15,6 +15,7 @@ node {
           if(checkout==0){
                 dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
                      sh 'k3s kubectl delete -f seacms.single.yaml'
+                     sh 'sleep 5'
                 } 
                 sh 'rm -rf /seacms/{mdb,app}'
           }
@@ -41,6 +42,16 @@ node {
             
           if(checkout==0){
                 sh 'docker rmi alpine-php5-lnmp'
+                sh 'docker image prune -f'
+          }
+
+          checkout=sh(
+                script: 'docker images -a | seacms',
+                returnStatus: true
+          )
+            
+          if(checkout==0){
+                sh 'docker rmi seacms'
                 sh 'docker image prune -f'
           }
        }	
