@@ -46,7 +46,7 @@ node {
           }
 
           checkout=sh(
-                script: 'docker images -a | seacms',
+                script: 'docker images -a | grep seacms',
                 returnStatus: true
           )
             
