@@ -45,7 +45,7 @@ node {
     }
     
     stage('start container'){
-        sh 'docker run -d -t -p 2006:3306 -p 2080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
+        sh 'docker run -d -t -p 30306:3306 -p 30080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
         sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
         dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
             sh "unzip seacms-13.zip -d /seacms/app/"
@@ -55,12 +55,10 @@ node {
     }
 
     stage('人工操作') {
-        steps {
-            script {
-                  input message: '请浏览器访问“http://ip:2080”，根据提示完成海洋cms安装向导，确认完成后继续', 
-                        ok: '继续执行', 
-                        id: 'manual_approval'
-            }
+        script {
+            input message: '请浏览器访问“http://ip:2080”，根据提示完成海洋cms安装向导，确认完成后继续', 
+            ok: '继续执行', 
+            id: 'manual_approval'
         }
     }
 
