@@ -8,7 +8,7 @@ node {
        script{
 
           checkout=sh(
-                script: 'k3s kubectl get pods -n cms| grep seacms',
+                script: 'k3s kubectl get pods -n cms| egrep "seacms|mdb"',
                 returnStatus: true
           )
           
@@ -21,13 +21,13 @@ node {
           }
 
           checkout=sh(
-                script: 'docker ps -a | grep seacms',
+                script: 'docker ps -a | egrep "seacms-app|seacms-mdb"',
                 returnStatus: true
           )
           
           if(checkout==0){
-                sh 'docker stop seacms'
-                sh 'docker rm seacms'
+                sh 'docker stop seacms-app seacms-mdb'
+                sh 'docker rm seacms-app seacms-mdb'
                 sh 'rm -rf /seacms/{mdb,app}'
           }
        }	
@@ -36,22 +36,22 @@ node {
     stage('check&remove docker-image'){
        script{
           checkout=sh(
-                script: 'docker images -a | grep alpine-php5-lnmp',
+                script: 'docker images -a | egrep "seacms-app|seacms-mdb"',
                 returnStatus: true
           )
             
           if(checkout==0){
-                sh 'docker rmi alpine-php5-lnmp'
+                sh 'docker rmi seacms-app seacms-mdb'
                 sh 'docker image prune -f'
           }
 
           checkout=sh(
-                script: 'docker images -a | grep seacms',
+                script: 'docker images -a | egrep "alpine-php5-nginx|alpine-mariadb"',
                 returnStatus: true
           )
             
           if(checkout==0){
-                sh 'docker rmi seacms'
+                sh 'docker rmi alpine-php5-nginx alpine-mariadb'
                 sh 'docker image prune -f'
           }
        }	
@@ -62,15 +62,21 @@ node {
           sh "docker load < alpine.v3.6.tar.gz" 
        }
         
-       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-lnmp'){
-          sh "docker build -t alpine-php5-lnmp ." 
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-nginx'){
+          sh "docker build -t alpine-php5-nginx ." 
+          sh "docker builder prune -f"
+       }
+
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-mariadb'){
+          sh "docker build -t alpine-mariadb ." 
           sh "docker builder prune -f"
        }
     }
     
     stage('start container'){
-       sh 'docker run -d -t -p 30306:3306 -p 30080:80 -v /seacms/mdb:/var/lib/mysql -v /seacms/app:/var/www/localhost/htdocs --name seacms alpine-php5-lnmp'
-       sh 'docker exec seacms /bin/sh -c "/mysql0.sh && /php_nginx0.sh"'
+       sh 'docker run -d -t -p 30306:3306 -v /seacms/mdb:/var/lib/mysql --name seacms-mdb alpine-mariadb'
+       sh 'docker exec seacms-mdb /bin/sh -c "/mysql0.sh"'
+       sh 'docker run -d -t -p 30080:80 -v /seacms/app:/var/www/localhost/htdocs --name seacms-app alpine-php5-nginx'
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
           sh "unzip seacms-13.zip -d /seacms/app/"
           sh "chmod -R 777 /seacms/app"
@@ -88,18 +94,20 @@ node {
 
     stage('build k8s-image'){
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
-          sh 'docker export seacms > seacms.tar'
-          sh 'cat seacms.tar | docker import - seacms'
-          sh 'docker stop seacms'
-          sh 'docker rm seacms'
-          sh 'docker rmi alpine-php5-lnmp'
+          sh 'docker export seacms-app > seacms-app.tar'
+          sh 'docker export seacms-mdb > seacms-mdb.tar'
+          sh 'cat seacms-app.tar | docker import - seacms-app'
+          sh 'cat seacms-mdb.tar | docker import - seacms-mdb'
+          sh 'docker stop seacms-app seacms-mdb'
+          sh 'docker rm seacms-app seacms-mdb'
+          sh 'docker rmi alpine-php5-nginx alpine-mariadb'
           sh 'docker rmi alpine:3.6'
        }
     }
 
     stage('apply k3s-seacms'){
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
-          sh 'k3s kubectl apply -f seacms.single.yaml'
+          sh 'k3s kubectl apply -f seacms.cluster.yaml'
        } 
     }
 }
