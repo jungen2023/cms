@@ -102,14 +102,14 @@ spec:
     matchLabels:
       volume: seacms-mdb  #通过label绑定PV(seacms-mdb)
 ---
-#创建一个StatefulSet类型的app(seacms-app)
+#创建一个StatefulSet类型的app
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: seacms-app
+  name: seacms
   namespace: cms
 spec:
-  serviceName: seacms-app  #Headless Service
+  serviceName: seacms  #Headless Service
   replicas: 1
   selector:
     matchLabels:
@@ -136,28 +136,6 @@ spec:
         volumeMounts:
         - mountPath: "/var/www/localhost/htdocs"
           name: seacmsapp
-      volumes:
-      - name: seacmsapp
-        persistentVolumeClaim:
-          claimName: seacms-app  #PVC名字
----
-#创建一个Deployment类型的app(seacms-mdb)
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: seacms-mdb
-  namespace: cms
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: seacms
-  template:
-    metadata:
-      labels:
-        app: seacms
-    spec:
-      containers:
       - name: seacms-mdb
         image: seacms-mdb
         imagePullPolicy: IfNotPresent
@@ -175,6 +153,9 @@ spec:
         - mountPath: "/var/lib/mysql"
           name: seacmsmdb
       volumes:
+      - name: seacmsapp
+        persistentVolumeClaim:
+          claimName: seacms-app  #PVC名字
       - name: seacmsmdb
         persistentVolumeClaim:
           claimName: seacms-mdb  #PVC名字
@@ -212,7 +193,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: seacms-app
+    name: seacms
   minReplicas: 1
   maxReplicas: 10
   metrics:
