@@ -84,14 +84,6 @@ node {
        }
     }
 
-    stage('人工操作') {
-       script {
-          input message: '请浏览器访问“http://ip:30080”，根据提示完成海洋cms安装向导，确认完成后继续', 
-          ok: '继续执行', 
-          id: 'manual_approval'
-       }
-    }
-
     stage('build k8s-image'){
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
           sh 'docker export seacms-app > seacms-app.tar'
