@@ -76,7 +76,7 @@ node {
     stage('start container'){
        sh 'docker run -d -t -p 30306:3306 -v /seacms/mdb:/var/lib/mysql --name seacms-mdb alpine-mariadb'
        sh 'docker exec seacms-mdb /bin/sh -c "/mysql0.sh"'
-       sh 'docker run -d -t -p 30080:80 -v /seacms/app:/var/www/localhost/htdocs --name seacms-app --link seacms-mdb:mdb alpine-php5-nginx'
+       sh 'docker run -d -t -p 30080:80 -v /seacms/app:/var/www/localhost/htdocs --name seacms-app alpine-php5-nginx'
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/www'){
           sh "unzip seacms-13.zip -d /seacms/app/"
           sh "chmod -R 777 /seacms/app"
