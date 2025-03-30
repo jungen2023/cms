@@ -17,7 +17,6 @@ node {
                      sh 'k3s kubectl delete -f seacms.cluster.yaml'
                      sh 'sleep 30'
                 } 
-                sh 'rm -rf /seacms/{mdb,app}'
           }
 
           checkout=sh(
@@ -28,8 +27,8 @@ node {
           if(checkout==0){
                 sh 'docker stop seacms-app seacms-mdb'
                 sh 'docker rm seacms-app seacms-mdb'
-                sh 'rm -rf /seacms/{mdb,app}'
           }
+          sh 'rm -rf /seacms/{mdb,app}'
        }	
     }
     
