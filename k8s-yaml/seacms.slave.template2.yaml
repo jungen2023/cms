@@ -1,0 +1,194 @@
+#创建一个PV,挂载本地目录/seacms/app
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    volume: seacms-app-slave
+  name: seacms-app-slave
+spec:
+  capacity:
+    storage: 30Mi
+  accessModes:
+    - ReadOnlyMany
+  nfs:
+    server: 192.168.57.5
+    path: /seacms/app
+---
+#创建一个PVC(seacms-app-slave)，绑定PV(seacms-app-slave）
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seacms-app-slave
+  namespace: cms
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 30Mi
+  selector:
+    matchLabels:
+      volume: seacms-app-slave  #通过label绑定PV(seacms-app-slave)
+---
+#创建一个PV挂载本地目录/seacms/mdb
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    volume: seacms-mdb-slave
+  name: seacms-mdb-slave
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadOnlyMany
+  nfs:
+    server: 192.168.57.5
+    path: /seacms/mdb
+---
+#创建一个PVC(seacms-mdb-slave)，绑定PV(seacms-mdb-slave）
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seacms-mdb-slave
+  namespace: cms
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      volume: seacms-mdb-slave  #通过label绑定PV(seacms-mdb-slave)
+---
+#创建一个StatefulSet类型的app(seacms-app)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seacms-app-slave
+  namespace: cms
+spec:
+  serviceName: seacms-app-slave  #Headless Service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seacms-slave
+  template:
+    metadata:
+      labels:
+        app: seacms-slave
+    spec:
+      containers:
+      - name: seacms-app-slave
+        image: seacms-app
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args: ["/run.sh && tail -f /dev/null"]
+        resources:
+          requests:
+            cpu: "3m"
+            memory: "30Mi"
+          limits:
+            cpu: "50m"
+            memory: "50Mi"
+        ports:
+        - containerPort: 80
+          name: web-slave
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/www/localhost/htdocs"
+          name: seacmsapp-slave
+      volumes:
+      - name: seacmsapp-slave
+        persistentVolumeClaim:
+          claimName: seacms-app-slave  #PVC名字
+---
+#创建一个Deployment类型的app(seacms-mdb-slave)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seacms-mdb-slave
+  namespace: cms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seacms-slave
+  template:
+    metadata:
+      labels:
+        app: seacms-slave
+    spec:
+      containers:
+      - name: seacms-mdb-slave
+        image: seacms-mdb
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args: ["/run.sh && tail -f /dev/null"]
+        resources:
+          requests:
+            cpu: "15m"
+            memory: "90Mi"
+          limits:
+            cpu: "100m"
+            memory: "150Mi"
+        ports:
+        - containerPort: 3306
+          name: mysql-slave
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: seacmsmdb-slave
+      volumes:
+      - name: seacmsmdb-slave
+        persistentVolumeClaim:
+          claimName: seacms-mdb-slave  #PVC名字
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seacms-slave
+  namespace: cms
+spec:
+  ports:
+  - name: web-slave
+    protocol: TCP
+    port: 80           #service对外端口
+    targetPort: 80     #容器端口
+    nodePort: 30080    #nodeport
+  - name: mysql-slave
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: seacms-slave
+  type: NodePort
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: seacms-app-slave
+  namespace: cms
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: seacms-app-slave
+  targetCPUUtilizationPercentage: 80
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: seacms-mdb-slave
+  namespace: cms
+spec:
+  minReplicas: 1
+  maxReplicas: 4
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: seacms-mdb-slave
+  targetCPUUtilizationPercentage: 90

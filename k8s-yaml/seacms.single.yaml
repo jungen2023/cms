@@ -28,7 +28,7 @@ spec:
   capacity:
     storage: 30Mi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain #回收策略，保留，需要手动回收
   storageClassName: local-storage       #使用local-storage存储组策略
   #hostPath:         #local卷类型应该使用spec.local.path而不是hostPath
@@ -51,7 +51,7 @@ metadata:
   namespace: cms
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 30Mi
@@ -71,7 +71,7 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain #回收策略，保留，需要手动回收
   storageClassName: local-storage
   local:
@@ -93,7 +93,7 @@ metadata:
   namespace: cms
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -149,9 +149,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    kubernetes.io/cluster-service: 'true'
-    kubernetes.io/name: seacms
   name: seacms
   namespace: cms
 spec:

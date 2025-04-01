@@ -6,16 +6,6 @@ metadata:
     kubernetes.io/metadata.name: cms    #与命名空间名一致
   name: cms
 ---
-#创建StorageClass
-#在 k8s 1.20 之后，出于对性能和统一 apiserver 调用方式的初衷，k8s 移除了对 SelfLink 的支持，而默认上面指定的 provisioner 版本需要 SelfLink 功能，因此 PVC 无法进行自动制备。
-#参考链接：https://juejin.cn/post/7329867093871116298
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: local-storage
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer  #WaitForFirstConsumer模式，将推迟绑定PV直到Pod实际需要它，这有助于确保Pod与正确的PV配对
----
 #创建一个PV,挂载本地目录/seacms/app
 apiVersion: v1
 kind: PersistentVolume
@@ -28,20 +18,10 @@ spec:
   capacity:
     storage: 30Mi
   accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain #回收策略，保留，需要手动回收
-  storageClassName: local-storage       #使用local-storage存储组策略
-  #hostPath:         #local卷类型应该使用spec.local.path而不是hostPath
-  local:
-    path: /seacms/app  #本地存储路径，必须事先存在于节点上
-  nodeAffinity:   #确保PV与特定节点关联
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - k8s-master    #指定了节点亲和性以确保该PV仅能在名为k8s-master的节点上使用
+    - ReadOnlyMany
+  nfs:
+    server: 192.168.57.5
+    path: /seacms/app
 ---
 #创建一个PVC(seacms-app)，绑定PV(seacms-app）
 apiVersion: v1
@@ -51,11 +31,10 @@ metadata:
   namespace: cms
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadOnlyMany
   resources:
     requests:
       storage: 30Mi
-  storageClassName: local-storage       #使用local-storage存储组策略
   selector:
     matchLabels:
       volume: seacms-app  #通过label绑定PV(seacms-app)
@@ -71,19 +50,10 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain #回收策略，保留，需要手动回收
-  storageClassName: local-storage
-  local:
-    path: /seacms/mdb
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - k8s-master  #指定了节点亲和性以确保该PV仅能在名为k8s-master的节点上使用
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.57.5
+    path: /seacms/app
 ---
 #创建一个PVC(seacms-mdb)，绑定PV(seacms-mdb）
 apiVersion: v1
@@ -93,11 +63,10 @@ metadata:
   namespace: cms
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  storageClassName: local-storage       #使用local-storage存储组策略
   selector:
     matchLabels:
       volume: seacms-mdb  #通过label绑定PV(seacms-mdb)
@@ -202,24 +171,3 @@ spec:
   selector:
     app: seacms
   type: NodePort
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: seacms-app
-  namespace: cms
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: StatefulSet
-    name: seacms-app
-  minReplicas: 1
-  maxReplicas: 10
-  metrics:
-  - type: ContainerResource
-    containerResource:
-      name: cpu #或memory
-      container: seacms-app  #目标容器名称
-      target:
-        type: Utilization
-        averageUtilization: 80
