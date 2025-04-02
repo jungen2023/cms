@@ -1,0 +1,91 @@
+#创建namespace: cms
+apiVersion: v1  #指定了 Kubernetes API 的版本为v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: cms    #与命名空间名一致
+  name: cms
+---
+#创建一个pod类型的app
+apiVersion: v1
+kind: Pod
+metadata:
+  name: seacms
+  namespace: cms
+spec:
+  containers:
+  - name: seacms-app
+    image: seacms-app
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args: ["/run.sh && tail -f /dev/null"]
+    resources:
+      requests:
+        cpu: "5m"
+        memory: "15Mi"
+        ephemeral-storage: "100Mi"
+      limits:
+        cpu: "50m"
+        memory: "50Mi"
+        ephemeral-storage: "150Mi"
+    ports:
+    - containerPort: 80
+      name: web
+      protocol: TCP
+    volumeMounts:
+    - mountPath: "/var/www/localhost/htdocs"
+      name: seacmsapp
+  - name: seacms-mdb
+    image: seacms-mdb
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args: ["/run.sh && tail -f /dev/null"]
+    resources:
+      requests:
+        cpu: "15m"
+        memory: "90Mi"
+        ephemeral-storage: "300Mi"
+      limits:
+        cpu: "100m"
+        memory: "150Mi"
+        ephemeral-storage: "500Mi"
+    ports:
+    - containerPort: 3306
+      name: mysql
+      protocol: TCP
+    volumeMounts:
+    - mountPath: "/var/lib/mysql"
+      name: seacmsmdb
+  volumes:
+  - name: seacmsapp
+    hostPath:
+      path: "/seacms/app"
+      type: DirectoryOrCreate
+  - name: seacmsmdb
+    hostPath:
+      path: /seacms/mdb
+      type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: seacms
+  name: seacms
+  namespace: cms
+spec:
+  ports:
+  - name: web
+    protocol: TCP
+    port: 80           #service对外端口
+    targetPort: 80     #容器端口
+    nodePort: 30080    #nodeport
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+    nodePort: 30306
+  selector:
+    app: seacms
+  type: NodePort
