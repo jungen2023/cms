@@ -12,6 +12,8 @@ kind: Pod
 metadata:
   name: seacms
   namespace: cms
+  labels:
+    app: seacms
 spec:
   containers:
   - name: seacms-app
@@ -75,6 +77,8 @@ metadata:
   name: seacms
   namespace: cms
 spec:
+  selector:
+    app: seacms
   ports:
   - name: web
     protocol: TCP
@@ -86,6 +90,4 @@ spec:
     port: 3306
     targetPort: 3306
     nodePort: 30306
-  selector:
-    app: seacms
   type: NodePort
