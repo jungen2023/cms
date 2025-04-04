@@ -12,4 +12,9 @@ spec:
     image: alpine-nfsclient
     imagePullPolicy: IfNotPresent
     command: ["/bin/sh", "-c"]
-    args: ["/run.sh && tail -f /dev/null"]
+    args: ["mount -o ro -t nfs nfs-server:/nfsshare/seacms/app /nfsshare && tail -f /dev/null"]
+    volumeMounts:
+    - mountPath: "/nfsshare"
+      name: nfsshare
+  volumes:
+   - name: nfsshare
