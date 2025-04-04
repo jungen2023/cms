@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #创建共享目录并设置权限
-mkdir /nfsshare
+mkdir -p /nfsshare/seacms
 chmod -R 777 /nfsshare
 echo '/nfsshare   10.0.0.0/8(rw,sync,no_root_squash)' >> /etc/exports
 
