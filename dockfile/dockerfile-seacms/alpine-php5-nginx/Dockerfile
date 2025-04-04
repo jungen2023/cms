@@ -1,8 +1,7 @@
 FROM alpine:3.6
 
 #配置阿里apk源
-RUN echo "http://mirrors.aliyun.com/alpine/v3.6/main" > /etc/apk/repositories && \
-    echo "http://mirrors.aliyun.com/alpine/v3.6/community" >> /etc/apk/repositories && \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk update  #更新使源地址生效
 
 #安装软件包,openrc开机自启动管理软件
