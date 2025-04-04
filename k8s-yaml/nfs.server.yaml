@@ -1,0 +1,56 @@
+#创建一个Deployment类型的nfs
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-server
+  namespace: cms
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-server
+  template:
+    metadata:
+      labels:
+        app: nfs-server
+spec:
+  containers:
+  - name: nfs-server
+    image: alpine-nfsserver
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args: ["/run.sh && tail -f /dev/null"]
+    securityContext:
+      privileged: true  #启用特权模式
+    ports:
+    - containerPort: 2049
+      name: nfs-server
+      protocol: TCP
+    - containerPort: 111
+      name: rpc
+      protocol: TCP
+    volumeMounts:
+    - mountPath: "/nfsshare/seacms"
+      name: nfsshare
+  volumes:
+  - name: nfsshare
+    hostPath:
+      path: "/seacms"
+      type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nfs-server
+  namespace: cms
+spec:
+  selector:
+    app: nfs-server
+  ports:
+  - name: nfs-server
+    protocol: TCP
+    port: 2049           #service对外端口
+    targetPort: 2049     #容器端口
+  - name: rpc
+    protocol: TCP
+    port: 111
+    targetPort: 111
