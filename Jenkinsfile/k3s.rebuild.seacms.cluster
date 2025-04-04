@@ -6,15 +6,14 @@ node {
     
     stage('check&remove container'){
        script{
-
           checkout=sh(
                 script: 'k3s kubectl get pods -n cms| egrep "seacms|mdb"',
                 returnStatus: true
           )
-          
           if(checkout==0){
                 dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
-                     sh 'k3s kubectl delete -f seacms.cluster.yaml'
+                     sh 'k3s kubectl delete -f seacms.slave.yaml'
+                     sh 'k3s kubectl delete -f seacms.master.yaml'
                      sh 'sleep 30'
                 } 
           }
@@ -23,7 +22,6 @@ node {
                 script: 'docker ps -a | egrep "seacms-app|seacms-mdb"',
                 returnStatus: true
           )
-          
           if(checkout==0){
                 sh 'docker stop seacms-app seacms-mdb'
                 sh 'docker rm seacms-app seacms-mdb'
@@ -38,9 +36,8 @@ node {
                 script: 'docker images -a | egrep "seacms-app|seacms-mdb"',
                 returnStatus: true
           )
-            
           if(checkout==0){
-                sh 'docker rmi seacms-app seacms-mdb'
+                sh 'docker rmi seacms-app seacms-mdb seacms-app-nfs seacms-mdb-nfs'
                 sh 'docker image prune -f'
           }
 
@@ -48,7 +45,6 @@ node {
                 script: 'docker images -a | egrep "alpine-php5-nginx|alpine-mariadb"',
                 returnStatus: true
           )
-            
           if(checkout==0){
                 sh 'docker rmi alpine-php5-nginx alpine-mariadb'
                 sh 'docker image prune -f'
@@ -61,6 +57,17 @@ node {
           sh "docker load < alpine.v3.6.tar.gz" 
        }
         
+       checkout=sh(
+          script: 'docker images -a | grep "alpine-nfsserver"',
+          returnStatus: true
+       )
+       if(checkout==0){
+          dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-nfsserver'){
+                sh "docker build -t alpine-nfsserver ." 
+                sh "docker builder prune -f"
+          }
+       }
+
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-php5-nginx'){
           sh "docker build -t alpine-php5-nginx ." 
           sh "docker builder prune -f"
@@ -104,7 +111,16 @@ node {
 
     stage('apply k3s-seacms'){
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
-          sh 'k3s kubectl apply -f seacms.cluster.yaml'
+          checkout=sh(
+                script: 'k3s kubectl get deployment -n cms|grep "nfs-server"',
+                returnStatus: true
+          )
+          if(checkout==0){
+                sh 'k3s kubectl apply -f nfs.server.yaml'
+          }
+
+          sh 'k3s kubectl apply -f seacms.master.yaml'
+          sh 'k3s kubectl apply -f seacms.slave.yaml'
        } 
     }
 }
