@@ -27,8 +27,14 @@ spec:
           name: nfs-server
           protocol: TCP
         - containerPort: 111
-          name: rpc
+          name: rpc-tcp
           protocol: TCP
+        - containerPort: 4046
+          name: lockd
+          protocol: UDP
+        - containerPort: 111
+          name: rpc-udp
+          protocol: UDP
         volumeMounts:
         - mountPath: "/nfsshare/seacms"
           name: nfsshare
@@ -51,7 +57,15 @@ spec:
     protocol: TCP
     port: 2049           #service对外端口
     targetPort: 2049     #容器端口
-  - name: rpc
+  - name: rpc-tcp
     protocol: TCP
+    port: 111
+    targetPort: 111
+  - name: lockd
+    protocol: UDP
+    port: 4046
+    targetPort: 4046
+  - name: rpc-udp
+    protocol: UDP
     port: 111
     targetPort: 111
