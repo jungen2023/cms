@@ -13,7 +13,7 @@ node {
           if(checkout==0){
                 dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
                      sh 'k3s kubectl delete -f nfs.server.yaml'
-                     sh 'sleep 30'
+                     sh 'sleep 40'
                 } 
           }
 
