@@ -171,4 +171,12 @@ node {
           sh 'k3s kubectl apply -f seacms.slave.yaml'
        } 
     }
+
+    stage('set port limitrules'){
+       sh 'iptables -I INPUT -p tcp --dport 30080 ACCEPT'
+       sh 'iptables -I INPUT -p tcp --dport 30081 REJECT'
+       sh 'iptables -I INPUT -p tcp --dport 30080 -m string --string “GET /cms” --algo kmp -j REJECT'
+       sh 'iptables -I INPUT -p tcp --dport 30081 -m string --string “GET /cms” --algo kmp -j ACCEPT'
+       sh 'iptables-save > /etc/iptables/rules.v4'
+    }
 }
