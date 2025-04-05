@@ -16,10 +16,12 @@ spec:
     spec:
       containers:
       - name: seacms-app-master
-        image: seacms-app
+        image: seacms-app-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
         args: ["mount -o rw -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
+        securityContext:
+          privileged: true  #启用特权模式
         resources:
           requests:
             cpu: "10m"
@@ -50,10 +52,12 @@ spec:
     spec:
       containers:
       - name: seacms-mdb-master
-        image: seacms-mdb
+        image: seacms-mdb-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
         args: ["mount -o rw -t nfs nfs-server:/nfsshare/seacms/mdb /var/lib/mysql;/run.sh;tail -f /dev/null"]
+        securityContext:
+          privileged: true  #启用特权模式
         resources:
           requests:
             cpu: "15m"
