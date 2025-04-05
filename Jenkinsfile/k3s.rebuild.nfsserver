@@ -1,0 +1,93 @@
+checkout=0
+node {
+    stage('pull code'){
+       git credentialsId: '8c6e5e99-2e98-4e9d-90e1-8e7eae035a5e', url: 'https://gitee.com/jungen2023/cms.git'
+    }
+    
+    stage('check&remove container'){
+       script{
+          checkout=sh(
+                script: 'k3s kubectl get pods -n cms| grep nfs-server',
+                returnStatus: true
+          )
+          if(checkout==0){
+                dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
+                     sh 'k3s kubectl delete -f nfs.server.yaml'
+                     sh 'sleep 30'
+                } 
+          }
+
+          checkout=sh(
+                script: 'docker ps -a | grep nfs-server',
+                returnStatus: true
+          )
+          if(checkout==0){
+                sh 'docker stop nfs-server'
+                sh 'docker rm nfs-server'
+          }
+       }	
+    }
+    
+    stage('check&remove docker-image'){
+       script{
+          checkout=sh(
+                script: 'docker images -a | grep alpine-nfsserver',
+                returnStatus: true
+          )
+          if(checkout==0){
+                sh 'docker rmi alpine-nfsserver'
+                sh 'docker image prune -f'
+          }
+
+          checkout=sh(
+                script: 'docker images -a | grep nfs-server',
+                returnStatus: true
+          )
+          if(checkout==0){
+                sh 'docker rmi nfs-server'
+                sh 'docker image prune -f'
+          }
+       }	
+    }
+
+    stage('build docker-image'){
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
+          sh "docker load < alpine.v3.6.tar.gz" 
+       }
+        
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/dockfile/dockerfile-seacms/alpine-nfsserver'){
+          sh "docker build -t alpine-nfsserver ." 
+          sh "docker builder prune -f"
+       }
+    }
+    
+    stage('start container'){
+       sh 'docker run --privileged -d -t -p 32049:2049 -p 30111:111 -v /seacms:/nfsshare/seacms --name nfs-server alpine-nfsserver'
+       }
+    }
+
+    stage('build k8s-image'){
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
+          sh 'docker export nfs-server > nfs-server.tar'
+          sh 'cat nfs-server.tar | docker import - nfs-server'
+          sh 'docker stop nfs-server'
+          sh 'docker rm nfs-server'
+          sh 'docker rmi alpine-nfsserver'
+          sh 'docker rmi alpine:3.6'
+       }
+    }
+
+    stage('apply k3s-seacms'){
+       dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
+          checkout=sh(
+                script: 'k3s kubectl get namespace|grep cms',
+                returnStatus: true
+          )
+          if(checkout==0){
+                sh 'k3s kubectl apply -f cms.yaml'
+          }
+
+          sh 'k3s kubectl apply -f nfs.server.yaml'
+       } 
+    }
+}

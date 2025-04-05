@@ -6,12 +6,10 @@ node {
     
     stage('check&remove container'){
        script{
-
           checkout=sh(
                 script: 'k3s kubectl get pods -n cms| grep seacms',
                 returnStatus: true
           )
-          
           if(checkout==0){
                 dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
                      sh 'k3s kubectl delete -f seacms.single.yaml'
@@ -23,7 +21,6 @@ node {
                 script: 'docker ps -a | grep seacms',
                 returnStatus: true
           )
-          
           if(checkout==0){
                 sh 'docker stop seacms'
                 sh 'docker rm seacms'
@@ -38,7 +35,6 @@ node {
                 script: 'docker images -a | grep alpine-php5-lnmp',
                 returnStatus: true
           )
-            
           if(checkout==0){
                 sh 'docker rmi alpine-php5-lnmp'
                 sh 'docker image prune -f'
@@ -48,7 +44,6 @@ node {
                 script: 'docker images -a | grep seacms',
                 returnStatus: true
           )
-            
           if(checkout==0){
                 sh 'docker rmi seacms'
                 sh 'docker image prune -f'
