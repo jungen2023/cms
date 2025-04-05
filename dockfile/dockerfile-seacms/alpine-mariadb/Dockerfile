@@ -11,7 +11,6 @@ RUN apk add openrc pwgen mariadb mariadb-client nfs-utils
 #上传脚本
 ADD run.sh /run.sh
 ADD mysql0.sh /mysql0.sh
-ADD nfs-client.sh /nfs-client.sh
 RUN chmod +x /*.sh
 
 #暴漏端口
