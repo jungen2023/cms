@@ -4,6 +4,7 @@ kind: Deployment
 metadata:
   name: nfs-server
   namespace: cms
+spec:
   replicas: 1
   selector:
     matchLabels:
@@ -12,30 +13,30 @@ metadata:
     metadata:
       labels:
         app: nfs-server
-spec:
-  containers:
-  - name: nfs-server
-    image: nfs-server
-    imagePullPolicy: IfNotPresent
-    command: ["/bin/sh", "-c"]
-    args: ["/run.sh && tail -f /dev/null"]
-    securityContext:
-      privileged: true  #启用特权模式
-    ports:
-    - containerPort: 2049
-      name: nfs-server
-      protocol: TCP
-    - containerPort: 111
-      name: rpc
-      protocol: TCP
-    volumeMounts:
-    - mountPath: "/nfsshare/seacms"
-      name: nfsshare
-  volumes:
-  - name: nfsshare
-    hostPath:
-      path: "/seacms"
-      type: DirectoryOrCreate
+    spec:
+      containers:
+      - name: nfs-server
+        image: nfs-server
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args: ["/run.sh && tail -f /dev/null"]
+        securityContext:
+          privileged: true  #启用特权模式
+        ports:
+        - containerPort: 2049
+          name: nfs-server
+          protocol: TCP
+        - containerPort: 111
+          name: rpc
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/nfsshare/seacms"
+          name: nfsshare
+      volumes:
+      - name: nfsshare
+        hostPath:
+          path: "/seacms"
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
