@@ -83,7 +83,7 @@ node {
                 script: 'k3s kubectl get namespace|grep cms',
                 returnStatus: true
           )
-          if(checkout==0){
+          if(checkout!=0){
                 sh 'k3s kubectl apply -f cms.yaml'
           }
 

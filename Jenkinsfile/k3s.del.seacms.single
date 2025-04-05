@@ -15,7 +15,7 @@ node {
                 dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
                      sh 'k3s kubectl delete -f seacms.single.yaml'
                 } 
-                sh 'rm -rf /seacms'
+                sh 'rm -rf /seacms/{app,mdb}'
           }
        }	
     }

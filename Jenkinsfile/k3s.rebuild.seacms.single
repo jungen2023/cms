@@ -93,6 +93,14 @@ node {
 
     stage('apply k3s-seacms'){
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/k8s-yaml'){
+          checkout=sh(
+                script: 'k3s kubectl get namespace|grep cms',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'k3s kubectl apply -f cms.yaml'
+          }
+
           sh 'k3s kubectl apply -f seacms.single.yaml'
        } 
     }
