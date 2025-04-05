@@ -20,12 +20,12 @@ spec:
         image: seacms-app-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["/run.sh && tail -f /dev/null"]
+        args: ["mount -o ro -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
         securityContext:
           privileged: true  #启用特权模式
         resources:
           requests:
-            cpu: "3m"
+            cpu: "10m"
             memory: "30Mi"
           limits:
             cpu: "50m"
