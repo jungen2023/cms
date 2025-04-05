@@ -21,6 +21,8 @@ spec:
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
         args: ["/run.sh && tail -f /dev/null"]
+        securityContext:
+          privileged: true  #启用特权模式
         resources:
           requests:
             cpu: "3m"
