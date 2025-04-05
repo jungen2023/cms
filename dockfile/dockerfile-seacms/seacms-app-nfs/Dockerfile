@@ -4,10 +4,7 @@ FROM seacms-app
 RUN apk add nfs-utils
 
 #挂载磁盘
-RUN grep "/var/lib/mysql" /etc/fstab \
-    if [ $? -ne 0 ];then \
-       echo "nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs nfs ro,noatime,nofail,_netdev 0 0" >> /etc/fstab \
-    fi 
+RUN grep "/var/lib/mysql" /etc/fstab;if [ $? -ne 0 ];then echo "nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs nfs ro,noatime,nofail,_netdev 0 0" >> /etc/fstab;fi 
 
 #暴漏端口
 EXPOSE 80
