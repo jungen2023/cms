@@ -1,11 +1,4 @@
-#创建namespace: cms
-apiVersion: v1  #指定了 Kubernetes API 的版本为v1
-kind: Namespace
-metadata:
-  labels:
-    kubernetes.io/metadata.name: cms    #与命名空间名一致
-  name: cms
----
+#创建一个Deployment类型的app(seacms-app-master)
 kind: Deployment
 metadata:
   name: seacms-app-master
