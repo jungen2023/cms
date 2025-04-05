@@ -15,7 +15,7 @@ metadata:
 spec:
   containers:
   - name: nfs-server
-    image: alpine-nfsserver
+    image: nfs-server
     imagePullPolicy: IfNotPresent
     command: ["/bin/sh", "-c"]
     args: ["/run.sh && tail -f /dev/null"]
