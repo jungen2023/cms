@@ -63,7 +63,6 @@ node {
     
     stage('start container'){
        sh 'docker run --privileged -d -t -p 32049:2049 -p 30111:111 -v /seacms:/nfsshare/seacms --name nfs-server alpine-nfsserver'
-       }
     }
 
     stage('build k8s-image'){
