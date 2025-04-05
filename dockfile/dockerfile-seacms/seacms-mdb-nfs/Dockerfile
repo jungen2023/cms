@@ -4,7 +4,7 @@ FROM seacms-mdb
 RUN apk add nfs-utils
 
 #挂载磁盘
-RUN grep "/var/lib/mysql" /etc/fstab;if [ $? -ne 0 ];then echo "nfs-server:/nfsshare/seacms/mdb /var/lib/mysql nfs ro,noatime,nofail,_netdev 0 0" >> /etc/fstab;fi 
+#RUN grep "/var/lib/mysql" /etc/fstab;if [ $? -ne 0 ];then echo "nfs-server:/nfsshare/seacms/mdb /var/lib/mysql nfs ro,noatime,nofail,_netdev 0 0" >> /etc/fstab;fi 
 
 #暴漏端口
 EXPOSE 3306
