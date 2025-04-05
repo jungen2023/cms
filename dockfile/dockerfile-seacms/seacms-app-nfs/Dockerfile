@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM seacms-app
 
 #安装软件包,openrc开机自启动管理软件
 RUN apk add nfs-utils
