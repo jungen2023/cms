@@ -14,7 +14,7 @@ ADD nfsserver0.sh /nfsserver0.sh
 RUN chmod +x /*.sh
 
 #暴漏端口
-EXPOSE 2049 111
+EXPOSE 111 2049 4046
 
 #docker运行时执行命令
 CMD ["sh","-c","/run.sh && tail -f /dev/null"]
