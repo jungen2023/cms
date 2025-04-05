@@ -19,7 +19,7 @@ spec:
         image: seacms-app-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["mount -o rw -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
+        args: ["mount -o rw,noatime,nofail,_netdev -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
         securityContext:
           privileged: true  #启用特权模式
         resources:
@@ -55,7 +55,7 @@ spec:
         image: seacms-mdb-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["mount -o rw -t nfs nfs-server:/nfsshare/seacms/mdb /var/lib/mysql;/run.sh;tail -f /dev/null"]
+        args: ["mount -o rw,noatime,nofail,_netdev -t nfs nfs-server:/nfsshare/seacms/mdb /var/lib/mysql;/run.sh;tail -f /dev/null"]
         securityContext:
           privileged: true  #启用特权模式
         resources:
