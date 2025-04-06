@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: seacms-app-master
-        image: seacms-app-nfs
+        image: seacms-app
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
         args: ["/run.sh;tail -f /dev/null"]
@@ -63,7 +63,7 @@ spec:
     spec:
       containers:
       - name: seacms-mdb-master
-        image: seacms-mdb-nfs
+        image: seacms-mdb
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
         args: ["/run.sh;tail -f /dev/null"]
