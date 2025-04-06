@@ -37,7 +37,7 @@ node {
                 returnStatus: true
           )
           if(checkout==0){
-                sh 'docker rmi seacms-app seacms-mdb seacms-app-nfs seacms-mdb-nfs'
+                sh 'docker rmi seacms-app seacms-mdb'
                 sh 'docker image prune -f'
           }
        }	

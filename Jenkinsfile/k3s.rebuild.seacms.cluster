@@ -45,7 +45,7 @@ node {
                 returnStatus: true
           )
           if(checkout==0){
-                sh 'docker rmi seacms-app seacms-mdb seacms-app-nfs seacms-mdb-nfs'
+                sh 'docker rmi seacms-app seacms-mdb'
                 sh 'docker image prune -f'
           }
 
@@ -91,14 +91,8 @@ node {
        dir('/var/lib/jenkins/workspace/junge.pipeline.docker.seacms/docker-images'){
           sh 'docker export seacms-app > seacms-app.tar'
           sh 'cat seacms-app.tar | docker import - seacms-app'
-          sh 'docker exec seacms-app /bin/sh -c "/nfs-client.sh"'
-          sh 'docker export seacms-app > seacms-app-nfs.tar'
-          sh 'cat seacms-app-nfs.tar | docker import - seacms-app-nfs'
           sh 'docker export seacms-mdb > seacms-mdb.tar'
           sh 'cat seacms-mdb.tar | docker import - seacms-mdb'
-          sh 'docker exec seacms-mdb /bin/sh -c "/nfs-client.sh"'
-          sh 'docker export seacms-mdb > seacms-mdb-nfs.tar'
-          sh 'cat seacms-mdb-nfs.tar | docker import - seacms-mdb-nfs'
           sh 'docker stop seacms-app seacms-mdb'
           sh 'docker rm seacms-app seacms-mdb'
           sh 'docker rmi alpine-php5-nginx alpine-mariadb'
