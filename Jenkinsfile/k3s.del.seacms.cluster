@@ -42,4 +42,18 @@ node {
           }
        }	
     }
+
+    stage('unset port limitrules'){
+       checkout=sh(
+          script: 'egrep "30080|30081" /etc/iptables/rules.v4',
+          returnStatus: true
+       )
+       if(checkout==0){
+          sh 'iptables -D INPUT -p tcp --dport 30080 -j ACCEPT'
+          sh 'iptables -D INPUT -p tcp --dport 30081 -j REJECT'
+          sh 'iptables -D INPUT -p tcp --dport 30080 -m string --string "GET /cms" --algo kmp -j REJECT'
+          sh 'iptables -D INPUT -p tcp --dport 30081 -m string --string "GET /cms" --algo kmp -j ACCEPT'
+          sh 'iptables-save > /etc/iptables/rules.v4'
+       }
+    }
 }
