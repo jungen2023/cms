@@ -32,6 +32,15 @@ spec:
         - containerPort: 80
           name: web-slave
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/www/localhost/htdocs"
+          name: seacmsapp
+      volumes:
+      - name: seacmsapp
+        nfs:
+          server: nfs.server.com #NFS服务器IP
+          path: /seacms/app    #NFS共享目录
+          readOnly: true      #可选，默认可读写
 ---
 #创建一个Deployment类型的app(seacms-mdb-slave)
 apiVersion: apps/v1
@@ -66,6 +75,15 @@ spec:
         - containerPort: 3306
           name: mysql-slave
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: seacmsmdb
+      volumes:
+      - name: seacmsmdb
+        nfs:
+          server: nfs.server.com #NFS服务器IP
+          path: /seacms/mdb    #NFS共享目录
+          readOnly: true      #可选，默认可读写
 ---
 apiVersion: v1
 kind: Service

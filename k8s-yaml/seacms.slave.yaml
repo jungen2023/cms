@@ -20,9 +20,7 @@ spec:
         image: seacms-app-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["mount -o ro,noatime,nofail,_netdev -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
-        securityContext:
-          privileged: true  #启用特权模式
+        args: ["/run.sh;tail -f /dev/null"]
         resources:
           requests:
             cpu: "10m"
@@ -34,11 +32,20 @@ spec:
         - containerPort: 80
           name: web-slave
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/www/localhost/htdocs"
+          name: seacmsapp
+      volumes:
+      - name: seacmsapp
+        nfs:
+          server: nfs.server.com #NFS服务器IP
+          path: /seacms/app    #NFS共享目录
+          readOnly: true      #可选，默认可读写
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: seacms
+  name: seacms-slave
   namespace: cms
 spec:
   ports:

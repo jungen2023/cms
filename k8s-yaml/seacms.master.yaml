@@ -19,9 +19,11 @@ spec:
         image: seacms-app-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["mount -o rw,noatime,nofail,_netdev -t nfs nfs-server:/nfsshare/seacms/app /var/www/localhost/htdocs;/run.sh;tail -f /dev/null"]
-        securityContext:
-          privileged: true  #启用特权模式
+        args: ["/run.sh;tail -f /dev/null"]
+        #securityContext:
+        #  privileged: true  #启用特权模式
+        #  capabilities:
+        #    add: ["SYS_ADMIN","NET_ADMIN"]
         resources:
           requests:
             cpu: "10m"
@@ -33,6 +35,15 @@ spec:
         - containerPort: 80
           name: web
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/www/localhost/htdocs"
+          name: seacmsapp
+      volumes:
+      - name: seacmsapp
+        nfs:
+          server: nfs.server.com #NFS服务器IP
+          path: /seacms/app    #NFS共享目录
+          readOnly: false      #可选，默认可读写
 ---
 #创建一个Deployment类型的app(seacms-mdb-master)
 apiVersion: apps/v1
@@ -55,9 +66,11 @@ spec:
         image: seacms-mdb-nfs
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "-c"]
-        args: ["mount -o rw,noatime,nofail,_netdev -t nfs nfs-server:/nfsshare/seacms/mdb /var/lib/mysql;/run.sh;tail -f /dev/null"]
-        securityContext:
-          privileged: true  #启用特权模式
+        args: ["/run.sh;tail -f /dev/null"]
+        #securityContext:
+        #  privileged: true  #启用特权模式
+        #  capabilities:
+        #    add: ["SYS_ADMIN","NET_ADMIN"]
         resources:
           requests:
             cpu: "15m"
@@ -69,6 +82,15 @@ spec:
         - containerPort: 3306
           name: mysql
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: seacmsmdb
+      volumes:
+      - name: seacmsmdb
+        nfs:
+          server: nfs.server.com #NFS服务器IP
+          path: /seacms/mdb    #NFS共享目录
+          readOnly: false      #可选，默认可读写
 ---
 apiVersion: v1
 kind: Service
