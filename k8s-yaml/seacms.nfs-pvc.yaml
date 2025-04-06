@@ -12,7 +12,7 @@ spec:
   accessModes:
     - ReadOnlyMany
   nfs:
-    server: 192.168.57.5
+    server: nfs.server.com
     path: /seacms/app
 ---
 #创建一个PVC(seacms-app)，绑定PV(seacms-app）
@@ -44,8 +44,8 @@ spec:
   accessModes:
     - ReadWriteOnce
   nfs:
-    server: 192.168.57.5
-    path: /seacms/app
+    server: nfs.server.com
+    path: /seacms/mdb
 ---
 #创建一个PVC(seacms-mdb)，绑定PV(seacms-mdb）
 apiVersion: v1
