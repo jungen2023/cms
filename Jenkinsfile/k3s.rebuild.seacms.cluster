@@ -110,6 +110,56 @@ node {
                 sh 'k3s kubectl apply -f cms.yaml'
           }
 
+          checkout=sh(
+                script: 'k3s kubectl get serviceaccounts -n cms|grep cms-admin',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'k3s kubectl apply -f cms-admin.secret.yaml'
+          }
+
+          checkout=sh(
+                script: 'k3s kubectl get serviceaccounts -n cms|grep cms-view',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'k3s kubectl apply -f cms-view.secret.yaml'
+          }
+
+          checkout=sh(
+                script: 'k3s kubectl config get-contexts|grep cms-admin',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'k3s kubectl config set-context cms-admin --namespace=cms --cluster=default --user=cms-admin'
+                sh 'TOKEN=$(k3s kubectl get secrets cms-admin-secret -n cms -o jsonpath='{.data.token}' | base64 -d)'
+                sh 'k3s kubectl config set-credentials cms-admin --token=$TOKEN'
+                sh 'k3s kubectl config view -n cms > /etc/rancher/k3s/cms-config.yaml'
+                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-admin-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /root/.bashrc'
+                sh 'echo "kubectl config set-credentials cms-admin --token=\$TOKEN" >> /root/.bashrc'
+          }
+
+          checkout=sh(
+                script: 'k3s kubectl config get-contexts|grep cms-view',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'k3s kubectl config set-context cms-view --namespace=cms --cluster=default --user=cms-view'
+                sh 'TOKEN=$(k3s kubectl get secrets cms-view-secret -n cms -o jsonpath='{.data.token}' | base64 -d)'
+                sh 'k3s kubectl config set-credentials cms-view --token=$TOKEN'
+                sh 'k3s kubectl config view -n cms > /etc/rancher/k3s/cms-config.yaml'
+                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-view-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /root/.bashrc'
+                sh 'echo "kubectl config set-credentials cms-view --token=\$TOKEN" >> /root/.bashrc'
+          }
+
+          checkout=sh(
+                script: 'grep "cms-config.yaml" /root/.bash.rc',
+                returnStatus: true
+          )
+          if(checkout!=0){
+                sh 'echo "export KUBECONFIG=${KUBECONFIG}:/etc/rancher/k3s/cms-config.yaml" >> /root/.bashrc'
+          }
+
           sh 'k3s kubectl apply -f seacms.master.yaml'
           sh 'k3s kubectl apply -f seacms.slave.yaml'
        } 
