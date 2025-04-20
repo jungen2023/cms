@@ -14,7 +14,7 @@ spec:
       labels:
         app-m: seacms-master
     spec:
-      serviceAccountName: cms-admin
+      #serviceAccountName: cms-admin
       containers:
       - name: seacms-app-master
         image: seacms-app
@@ -62,7 +62,7 @@ spec:
       labels:
         app-m: seacms-master
     spec:
-      serviceAccountName: cms-admin
+      #serviceAccountName: cms-admin
       containers:
       - name: seacms-mdb-master
         image: seacms-mdb
