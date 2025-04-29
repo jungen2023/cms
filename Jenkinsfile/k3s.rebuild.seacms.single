@@ -126,8 +126,8 @@ node {
                 sh 'TOKEN=$(k3s kubectl get secrets cms-admin-secret -n cms -o jsonpath='{.data.token}' | base64 -d)'
                 sh 'k3s kubectl config set-credentials cms-admin --token=$TOKEN'
                 sh 'k3s kubectl config view -n cms > /etc/rancher/k3s/cms-config.yaml'
-                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-admin-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /root/.bashrc'
-                sh 'echo "kubectl config set-credentials cms-admin --token=\$TOKEN" >> /root/.bashrc'
+                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-admin-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /usr/local/bin/k3s-init'
+                sh 'echo "kubectl config set-credentials cms-admin --token=\$TOKEN" >> /usr/local/bin/k3s-init'
           }
 
           checkout=sh(
@@ -139,8 +139,8 @@ node {
                 sh 'TOKEN=$(k3s kubectl get secrets cms-view-secret -n cms -o jsonpath='{.data.token}' | base64 -d)'
                 sh 'k3s kubectl config set-credentials cms-view --token=$TOKEN'
                 sh 'k3s kubectl config view -n cms > /etc/rancher/k3s/cms-config.yaml'
-                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-view-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /root/.bashrc'
-                sh 'echo "kubectl config set-credentials cms-view --token=\$TOKEN" >> /root/.bashrc'
+                sh 'echo "TOKEN=$(k3s kubectl get secrets cms-view-secret -n cms -o jsonpath='{.data.token}' | base64 -d)" >> /usr/local/bin/k3s-init'
+                sh 'echo "kubectl config set-credentials cms-view --token=\$TOKEN" >> /usr/local/bin/k3s-init'
           }
 
           checkout=sh(
