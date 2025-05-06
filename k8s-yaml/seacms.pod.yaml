@@ -26,6 +26,16 @@ spec:
     - containerPort: 80
       name: web
       protocol: TCP
+    readinessProbe:
+      tcpSocket:
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDelaySeconds: 60
+      timeoutSeconds: 1
     volumeMounts:
     - mountPath: "/var/www/localhost/htdocs"
       name: seacmsapp
@@ -47,6 +57,16 @@ spec:
     - containerPort: 3306
       name: mysql
       protocol: TCP
+    readinessProbe:
+      tcpSocket:
+        port: 3306
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 3306
+      initialDelaySeconds: 60
+      timeoutSeconds: 1
     volumeMounts:
     - mountPath: "/var/lib/mysql"
       name: seacmsmdb
